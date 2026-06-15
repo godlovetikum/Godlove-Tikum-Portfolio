@@ -60,7 +60,7 @@ A single GitHub Actions workflow (`.github/workflows/deploy.yml`) detects which 
 
 ## Setup & Deployment
 
-The **<Docs/Setup.md>** provides two setup approaches for getting your portfolio live and running.
+The **[Docs/Setup.md](Docs/Setup.md)** provides two setup approaches for getting your portfolio live and running.
 It all depends on your setup 
 
 
