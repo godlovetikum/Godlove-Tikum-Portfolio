@@ -1,0 +1,22 @@
+# wrangler.toml — Cloudflare Pages project configuration for the public portfolio
+#
+# Cloudflare Pages project settings (set in the CF dashboard):
+#   Root directory:          Public
+#   Build command:           (none — no build step)
+#   Build output directory:  public
+#
+# With Root directory = "Public", CF Pages resolves:
+#   Static files:      Public/public/
+#   Pages Functions:   Public/functions/   (automatic — no extra config needed)
+#
+# Env vars to set in the Cloudflare dashboard (Settings → Environment variables):
+#   SUPABASE_URL         — https://<ref>.supabase.co
+#   PORTFOLIO_ORIGIN     — https://godlovetikum.pages.dev (or custom domain)
+#   CLIENT_AUTH_SECRET   — shared secret used to authenticate public→backend requests
+#
+# Local dev:
+#   cd Public && npx wrangler pages dev public --compatibility-flag=nodejs_compat
+#   Secrets go in Public/.dev.vars (gitignored)
+name                   = "godlovetikum"
+pages_build_output_dir = "public"
+

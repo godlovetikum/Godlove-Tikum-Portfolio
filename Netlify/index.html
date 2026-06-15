@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redirecting — Godlove Tikum</title>
+
+    <!-- Canonical signals the new location to search engines immediately -->
+    <link rel="canonical" href="https://godlovetikum.pages.dev/">
+
+    <!-- Meta-refresh fallback — fires if JS is disabled or the redirect rule fails -->
+    <meta http-equiv="refresh" content="0; url=https://godlovetikum.pages.dev/">
+
+    <!-- Tell crawlers not to index this redirect page -->
+    <meta name="robots" content="noindex, nofollow">
+
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+            background: #07101F;
+            color: #8FA8C2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            text-align: center;
+            padding: 2rem;
+        }
+        .wrap { max-width: 480px; }
+        .name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #EDF2F7;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.02em;
+        }
+        .name span { color: #0BDA8A; }
+        p { font-size: 0.95rem; line-height: 1.65; margin-bottom: 1.5rem; }
+        a {
+            display: inline-block;
+            background: #0BDA8A;
+            color: #07101F;
+            font-weight: 700;
+            font-size: 0.9rem;
+            padding: 0.65rem 1.5rem;
+            border-radius: 100px;
+            text-decoration: none;
+            transition: opacity 0.18s;
+        }
+        a:hover { opacity: 0.88; }
+        .note { font-size: 0.78rem; color: #4D6880; margin-top: 1.5rem; }
+    </style>
+</head>
+<body>
+    <div class="wrap">
+        <p class="name">Godlove <span>Tikum</span></p>
+        <p>This site has moved permanently.<br>You are being redirected now.</p>
+        <a href="https://godlovetikum.pages.dev/">Continue to portfolio</a>
+        <p class="note">
+            Bookmark updated: <strong>godlovetikum.pages.dev</strong>
+        </p>
+    </div>
+
+    <script>
+        // Immediate JS redirect — fastest path for browsers with JS enabled
+        window.location.replace(
+            'https://godlovetikum.pages.dev' + window.location.pathname + window.location.search
+        );
+    </script>
+</body>
+</html>

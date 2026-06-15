@@ -1,0 +1,25 @@
+# Netlify/netlify.toml
+#
+# This Netlify site is the SEO redirect layer for the portfolio.
+# Its sole purpose is to permanently 301-redirect all traffic to the
+# Cloudflare Pages domain at godlovetikum.pages.dev, preserving URL paths
+# so that any inbound links from external sites continue to resolve correctly.
+#
+# How to deploy:
+#   1. Create a Netlify site connected to this repo.
+#   2. Set the publish directory to: Netlify
+#   3. No build command needed. Deploy.
+#
+# The :splat capture preserves full paths on redirect:
+#   /about  →  https://godlovetikum.pages.dev/about
+#   /       →  https://godlovetikum.pages.dev/
+
+[build]
+    publish = "."
+    ignore  = "exit 0"
+
+[[redirects]]
+    from   = "/*"
+    to     = "https://godlovetikum.pages.dev/:splat"
+    status = 301
+    force  = true

@@ -1,0 +1,3 @@
+# Admin-worker SPA routing
+# Every path that isn't a static file falls through to index.html
+# No redirect configuration needed here

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin — Godlove Tikum</title>
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="stylesheet" href="./assets/styles/admin.css">
+    <!-- Font Awesome (local subset already in portfolio; using CDN here for admin) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+          crossorigin="anonymous" referrerpolicy="no-referrer">
+    <script src="/test/server.js" type="module" charset="utf-8"></script>
+</head>
+<body>
+<main class="login_page" id="loginPage">
+    <div class="login_card">
+        <p class="login_logo">Godlove <span>Tikum</span></p>
+        <p class="login_sub">Admin dashboard — restricted access.<br>
+            Sign-in to manage your portfolio, contact messages and inquiries</p>
+
+        <div class="login_error" id="loginError" role="alert" aria-live="polite"></div>
+
+        <form id="loginForm" action="javascript:void(0);" novalidate>
+            <div class="form_group">
+                <label class="form_label" for="loginEmail">Email</label>
+                <input class="form_input" id="loginEmail" type="email"
+                       autocomplete="email" required placeholder="admin@example.com">
+            </div>
+            <div class="form_group">
+                <label class="form_label" for="loginPassword">Password</label>
+                <input class="form_input" id="loginPassword" type="password"
+                       autocomplete="current-password" placeholder="........." required>
+            </div>
+            <button class="btn btn_primary" style="width:100%;justify-content:center;margin-top:0.5rem"
+                    type="submit" id="loginBtn">
+                Sign in
+            </button>
+        </form>
+    </div>
+</main>
+
+<script type="module" src="./assets/scripts/login.js">
+</script>
+</body>
+</html>

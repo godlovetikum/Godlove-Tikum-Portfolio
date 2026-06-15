@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard — Godlove Tikum Admin</title>
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="stylesheet" href="../assets/styles/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+          crossorigin="anonymous" referrerpolicy="no-referrer">
+    <!-- CodeMirror 5 — HTML editor with syntax highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.17/codemirror.min.css"
+          crossorigin="anonymous" referrerpolicy="no-referrer">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.17/theme/dracula.min.css"
+          crossorigin="anonymous" referrerpolicy="no-referrer">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.17/codemirror.min.js"
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.17/mode/xml/xml.min.js"
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.17/mode/css/css.min.js"
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.17/mode/javascript/javascript.min.js"
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.17/mode/htmlmixed/htmlmixed.min.js"
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.17/addon/edit/matchbrackets.min.js"
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.17/addon/edit/closetag.min.js"
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+        // Apply saved theme before paint to avoid flash
+        (function() {
+            var t = localStorage.getItem('gtAdminTheme') || 'dark';
+            document.documentElement.setAttribute('data-theme', t);
+        })();
+    </script>
+</head>
+<body>
+
+<!-- ── Compose modal (shared across all sections) ─────────────────────────── -->
+<div class="modal_overlay" id="modalOverlay" hidden></div>
+<div class="compose_modal" id="composeModal" hidden role="dialog"
+     aria-modal="true" aria-label="Compose email"></div>
+
+<!-- ── Layout shell ───────────────────────────────────────────────────────── -->
+<div class="admin_layout">
+
+    <!-- Topbar -->
+    <header class="topbar">
+        <button class="sidebar_toggle_btn" id="sidebarToggleBtn"
+                aria-label="Toggle navigation" aria-expanded="false"
+                aria-controls="mainSidebar">
+            <i class="fa-solid fa-bars" aria-hidden="true"></i>
+        </button>
+        <span class="topbar_logo">Godlove <span>Tikum</span> — Admin</span>
+        <span class="topbar_user" id="topbarUser"></span>
+        <button class="theme_toggle_btn" id="themeToggleBtn"
+                title="Switch to light mode" aria-label="Switch to light mode">
+            <i class="fa-solid fa-sun" aria-hidden="true"></i>
+        </button>
+        <button class="topbar_logout_btn" id="logoutBtn">
+            <i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i> Sign out
+        </button>
+    </header>
+
+    <!-- Sidebar -->
+    <nav class="sidebar" id="mainSidebar" aria-label="Admin navigation">
+        <span class="nav_section_label">Overview</span>
+        <button class="nav_item active" data-section="analytics">
+            <i class="fa-solid fa-chart-line" aria-hidden="true"></i> Analytics
+        </button>
+
+        <span class="nav_section_label">Contacts</span>
+        <button class="nav_item" data-section="contacts">
+            <i class="fa-solid fa-inbox" aria-hidden="true"></i> Submissions
+        </button>
+
+        <span class="nav_section_label">Email</span>
+        <button class="nav_item" data-section="email_templates">
+            <i class="fa-solid fa-file-lines" aria-hidden="true"></i> Templates
+        </button>
+        <button class="nav_item" data-section="email_compose">
+            <i class="fa-solid fa-paper-plane" aria-hidden="true"></i> Compose
+        </button>
+        <button class="nav_item" data-section="email_outbound">
+            <i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i> Sent History
+        </button>
+
+        <span class="nav_section_label">Export</span>
+        <button class="nav_item" data-section="export">
+            <i class="fa-solid fa-download" aria-hidden="true"></i> Export &amp; Print
+        </button>
+    </nav>
+
+    <!-- Main -->
+    <main class="main_content">
+
+        <!-- ── Analytics ────────────────────────────────────────── -->
+        <section class="section_panel active" id="analyticsPanel">
+            <div class="section_topbar">
+                <div>
+                    <h1 class="section_heading">Analytics</h1>
+                    <p class="section_sub">Visitor activity, engagement, and traffic trends</p>
+                </div>
+                <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap">
+                    <button class="btn btn_sm btn_ghost" id="exportAnalyticsBtn">
+                        <i class="fa-solid fa-download"></i> Export CSV
+                    </button>
+                    <button class="btn btn_sm btn_ghost" id="printAnalyticsBtn">
+                        <i class="fa-solid fa-print"></i> Print
+                    </button>
+                </div>
+            </div>
+            <div class="date_range_bar">
+                <label for="analyticsFrom">From</label>
+                <input type="date" class="filter_input" id="analyticsFrom" style="max-width:150px">
+                <label for="analyticsTo">To</label>
+                <input type="date" class="filter_input" id="analyticsTo" style="max-width:150px">
+                <button class="btn btn_sm btn_ghost" id="applyAnalyticsRange">Apply range</button>
+                <button class="btn btn_sm btn_ghost" id="clearAnalyticsRange">Last 30 days</button>
+            </div>
+            <div class="view_tabs" id="analyticsViewTabs" role="tablist">
+                <button class="view_tab active" data-view="summary"
+                        role="tab" aria-selected="true">Overview</button>
+                <button class="view_tab" data-view="trend"
+                        role="tab" aria-selected="false">Daily Trend</button>
+                <button class="view_tab" data-view="raw_visitors"
+                        role="tab" aria-selected="false">Raw Visitors</button>
+                <button class="view_tab" data-view="raw_clicks"
+                        role="tab" aria-selected="false">Raw Clicks</button>
+            </div>
+            <div id="analyticsSection"></div>
+        </section>
+
+        <!-- ── Contacts ──────────────────────────────────────────── -->
+        <section class="section_panel" id="contactsPanel">
+            <div class="section_topbar">
+                <div>
+                    <h1 class="section_heading">Contact Submissions</h1>
+                    <p class="section_sub">Every form submission — status, geo, and session cross-reference</p>
+                </div>
+                <button class="btn btn_sm btn_ghost" id="printContactsBtn">
+                    <i class="fa-solid fa-print"></i> Print
+                </button>
+            </div>
+            <div id="contactsSection"></div>
+        </section>
+
+        <!-- ── Email Templates ───────────────────────────────────── -->
+        <section class="section_panel" id="emailTemplatesPanel">
+            <div id="emailSection"></div>
+        </section>
+
+        <!-- ── Compose ───────────────────────────────────────────── -->
+        <section class="section_panel" id="emailComposePanel">
+            <div class="section_topbar">
+                <div>
+                    <h1 class="section_heading">Compose Email</h1>
+                    <p class="section_sub">Send a standalone email or open from any contact row</p>
+                </div>
+            </div>
+            <div style="padding-top:0.5rem">
+                <button class="btn btn_primary" id="openComposeBtn">
+                    <i class="fa-solid fa-paper-plane" aria-hidden="true"></i> New Email
+                </button>
+            </div>
+        </section>
+
+        <!-- ── Outbound Email History ─────────────────────────────── -->
+        <section class="section_panel" id="emailOutboundPanel">
+            <div class="section_topbar">
+                <div>
+                    <h1 class="section_heading">Sent History</h1>
+                    <p class="section_sub">All outbound emails — inspect, filter by status, and retry failures</p>
+                </div>
+            </div>
+            <div id="outboundSection"></div>
+        </section>
+
+        <!-- ── Export ────────────────────────────────────────────── -->
+        <section class="section_panel" id="exportPanel">
+            <div class="section_topbar">
+                <div>
+                    <h1 class="section_heading">Export &amp; Print</h1>
+                    <p class="section_sub">Download data as CSV or send a section to the printer</p>
+                </div>
+            </div>
+            <div class="grid_2col" style="margin-top:0.5rem">
+                <div class="card">
+                    <h3 class="card_title">Contacts</h3>
+                    <p style="font-size:0.82rem;margin-bottom:1rem;color:var(--text_muted)">
+                        Export all currently loaded contact submissions to a CSV file.
+                    </p>
+                    <button class="btn btn_ghost btn_sm" id="exportContactsCsvBtn">
+                        <i class="fa-solid fa-file-csv"></i> Download contacts.csv
+                    </button>
+                    <button class="btn btn_ghost btn_sm" style="margin-top:0.5rem" id="printContactsPageBtn">
+                        <i class="fa-solid fa-print"></i> Print contacts view
+                    </button>
+                </div>
+                <div class="card">
+                    <h3 class="card_title">Analytics</h3>
+                    <p style="font-size:0.82rem;margin-bottom:1rem;color:var(--text_muted)">
+                        Export the current analytics summary to a flat CSV file.
+                    </p>
+                    <button class="btn btn_ghost btn_sm" id="exportAnalyticsCsvBtn">
+                        <i class="fa-solid fa-file-csv"></i> Download analytics.csv
+                    </button>
+                    <button class="btn btn_ghost btn_sm" style="margin-top:0.5rem" id="printAnalyticsPageBtn">
+                        <i class="fa-solid fa-print"></i> Print analytics view
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+</div><!-- /.admin_layout -->
+
+<script type="module">
+import { Auth }                 from '../assets/scripts/auth.js';
+import { AdminTheme }           from '../assets/scripts/utils.js';
+import { renderAnalytics }      from '../assets/scripts/analytics.js';
+import { renderContacts }       from '../assets/scripts/contacts.js';
+import { renderEmailTemplates,
+         renderOutboundHistory,
+         openEmailCompose }      from '../assets/scripts/email.js';
+import { Export }               from '../assets/scripts/export.js';
+import { Analytics as API }     from '../assets/scripts/api.js';
+import { Contacts as ContactsAPI } from '../assets/scripts/api.js';
+
+// ── Theme ─────────────────────────────────────────────────────────────────────
+AdminTheme.init();
+document.getElementById('themeToggleBtn').addEventListener('click', () => AdminTheme.toggle());
+
+
+// ── Auth guard ────────────────────────────────────────────────────────────────
+await Auth.guard();
+
+const user = Auth.getUser();
+if (user?.email) {
+    document.getElementById('topbarUser').textContent = user.email;
+}
+
+document.getElementById('logoutBtn').addEventListener('click', async () => {
+    await Auth.logout();
+    window.location.href = '/';
+});
+
+
+// ── Section navigation ────────────────────────────────────────────────────────
+
+const PANELS = {
+    analytics:       document.getElementById('analyticsPanel'),
+    contacts:        document.getElementById('contactsPanel'),
+    email_templates: document.getElementById('emailTemplatesPanel'),
+    email_compose:   document.getElementById('emailComposePanel'),
+    email_outbound:  document.getElementById('emailOutboundPanel'),
+    export:          document.getElementById('exportPanel'),
+};
+
+let _activeSection  = 'analytics';
+let _loaded         = new Set();
+
+function showSection(name) {
+    if (!PANELS[name]) return;
+    Object.values(PANELS).forEach(p => p.classList.remove('active'));
+    PANELS[name].classList.add('active');
+
+    document.querySelectorAll('.nav_item').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.section === name);
+    });
+
+    _activeSection = name;
+
+    // Lazy-load section content on first visit
+    if (name === 'analytics')      _loadAnalytics();
+    if (name === 'contacts'  && !_loaded.has('contacts'))       { renderContacts(); _loaded.add('contacts'); }
+    if (name === 'email_templates') renderEmailTemplates();
+    if (name === 'email_outbound' && !_loaded.has('outbound'))  { renderOutboundHistory(); _loaded.add('outbound'); }
+}
+
+document.querySelectorAll('.nav_item[data-section]').forEach(btn => {
+    btn.addEventListener('click', () => showSection(btn.dataset.section));
+});
+
+
+// ── Analytics date range ──────────────────────────────────────────────────────
+
+function _getAnalyticsRange() {
+    return {
+        from: document.getElementById('analyticsFrom').value || null,
+        to:   document.getElementById('analyticsTo').value   || null,
+    };
+}
+
+function _loadAnalytics() {
+    const { from, to } = _getAnalyticsRange();
+    renderAnalytics(from, to);
+}
+
+document.getElementById('applyAnalyticsRange').addEventListener('click', _loadAnalytics);
+document.getElementById('clearAnalyticsRange').addEventListener('click', () => {
+    document.getElementById('analyticsFrom').value = '';
+    document.getElementById('analyticsTo').value   = '';
+    _loadAnalytics();
+});
+
+
+// ── Analytics export & print ─────────────────────────────────────────────────
+
+document.getElementById('exportAnalyticsBtn').addEventListener('click', async () => {
+    try {
+        const { from, to } = _getAnalyticsRange();
+        const data = await API.summary(from, to);
+        Export.analyticsCSV(data.data ?? data);
+    } catch (err) { alert(err.message); }
+});
+document.getElementById('printAnalyticsBtn').addEventListener('click', () =>
+    Export.printSection('analyticsPanel'));
+
+document.getElementById('exportAnalyticsCsvBtn')?.addEventListener('click', async () => {
+    try {
+        const { from, to } = _getAnalyticsRange();
+        const data = await API.summary(from, to);
+        Export.analyticsCSV(data.data ?? data);
+    } catch (err) { alert(err.message); }
+});
+document.getElementById('printAnalyticsPageBtn')?.addEventListener('click', () =>
+    Export.printSection('analyticsPanel'));
+
+
+// ── Contacts export & print ───────────────────────────────────────────────────
+
+document.getElementById('printContactsBtn').addEventListener('click', () =>
+    Export.printSection('contactsPanel'));
+document.getElementById('exportContactsCsvBtn')?.addEventListener('click', async () => {
+    try {
+        const data = await ContactsAPI.list({ limit: 100 });
+        Export.contactsCSV(data.contacts ?? []);
+    } catch (err) { alert(err.message); }
+});
+document.getElementById('printContactsPageBtn')?.addEventListener('click', () =>
+    Export.printSection('contactsPanel'));
+
+
+// ── Compose ───────────────────────────────────────────────────────────────────
+
+document.getElementById('openComposeBtn')?.addEventListener('click', () =>
+    openEmailCompose());
+
+
+// ── Mobile sidebar toggle ─────────────────────────────────────────────────────
+
+document.getElementById('sidebarToggleBtn')?.addEventListener('click', () => {
+    const sidebar = document.getElementById('mainSidebar');
+    const btn     = document.getElementById('sidebarToggleBtn');
+    const open    = sidebar.classList.toggle('sidebar_open');
+    btn.setAttribute('aria-expanded', String(open));
+});
+
+document.querySelectorAll('.nav_item[data-section]').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const sidebar = document.getElementById('mainSidebar');
+        if (sidebar?.classList.contains('sidebar_open')) {
+            sidebar.classList.remove('sidebar_open');
+            document.getElementById('sidebarToggleBtn')?.setAttribute('aria-expanded', 'false');
+        }
+    });
+});
+
+
+// ── Analytics view tabs ───────────────────────────────────────────────────────
+
+document.getElementById('analyticsViewTabs')?.addEventListener('click', (e) => {
+    const tab = e.target.closest('.view_tab');
+    if (!tab) return;
+    document.querySelectorAll('#analyticsViewTabs .view_tab').forEach(t => {
+        t.classList.toggle('active', t === tab);
+        t.setAttribute('aria-selected', String(t === tab));
+    });
+    const { from, to } = _getAnalyticsRange();
+    renderAnalytics(from, to, tab.dataset.view);
+});
+
+
+// ── Initial load ──────────────────────────────────────────────────────────────
+
+showSection('analytics');
+</script>
+</body>
+</html>
