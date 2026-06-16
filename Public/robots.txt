@@ -1,0 +1,33 @@
+User-agent: *
+Allow: /
+
+# AI crawlers — allow indexing for AIO / GEO visibility
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Anthropic-AI
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: cohere-ai
+Allow: /
+
+User-agent: Cursor-ai
+Allow: /
+
+# Machine-readable identity for all AI and language model crawlers
+# See the llms.txt standard at https://llmstxt.org
+LLMs: https://godlovetikum.pages.dev/llms.txt
+
+Sitemap: https://godlovetikum.pages.dev/sitemap.xml

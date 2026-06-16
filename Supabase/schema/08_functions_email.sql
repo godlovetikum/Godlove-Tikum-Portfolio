@@ -123,7 +123,7 @@ BEGIN
     RETURN row_to_json(v_row);
 EXCEPTION
     WHEN unique_violation THEN
-        RAISE EXCEPTION 'template.aready_exist';
+        RAISE EXCEPTION 'template.already_exists';
     WHEN invalid_text_representation THEN
         RAISE EXCEPTION 'template.invalid_category_or_type';
 END;

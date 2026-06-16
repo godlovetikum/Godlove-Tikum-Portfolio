@@ -1,0 +1,9 @@
+# Cloudflare Pages — redirects
+# Reference: https://developers.cloudflare.com/pages/configuration/redirects/
+#
+# This file handles redirects WITHIN this Cloudflare Pages site.
+# For the permanent SEO redirect from the Netlify domain to this site,
+# see Netlify/netlify.toml.
+#
+# Format: <source> <destination> <status>
+# No internal redirects are currently needed — the site is a single-page document.

@@ -1,0 +1,25 @@
+{
+  "_comment": "Public deploy-time config. Safe to commit — no secrets. Edit these values when forking for a new portfolio. GitHub Actions reads this file and substitutes __TOKEN__ placeholders in Public and Admin source files before deploying.",
+
+  "owner_name":       "Godlove Tikum",
+  "owner_first_name": "Godlove",
+  "owner_last_name":  "Tikum",
+  "owner_phone":      "237654841420",
+  "owner_email":      "godlovetikum@gmail.com",
+  "owner_location":   "Bamenda, Cameroon",
+  "owner_title":      "full-stack Web Developer",
+
+  "site_url":         "https://godlovetikum.pages.dev",
+  "site_key":         "godlove-tikum-v2",
+
+  "twitter_handle":   "godlovetikum",
+  "twitter_url":      "https://www.x.com/godlovetikum",
+  "facebook_url":     "https://www.facebook.com/godlovetikum101",
+  "instagram_url":    "https://www.instagram.com/godlovetikum",
+  "youtube_url":      "https://www.youtube.com/@godlovetikum",
+  "whatsapp_url":     "https://wa.me/237654841420",
+  "github_url":       "https://github.com/godlovetikum",
+
+  "cf_public_project": "godlovetikum",
+  "cf_admin_project":  "admin"
+}

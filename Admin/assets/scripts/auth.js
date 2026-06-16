@@ -1,83 +1,77 @@
 /**
  *  assets/scripts/auth.js
- *  Central controller of authentication client-side 
+ *  Central controller of authentication client-side
  */
- 
- import { api } from './api.js';
- 
- /**
-  *  Auth class
-  */
+
+import { api } from './api.js';
+
 class Auth {
     constructor() {
-        this.key = '_gt_admin_user'
+        this.key  = '_gt_admin_user';
         this.user = null;
-        this.init()
+        this._init();
     }
-    
-    /** boot and initialize local user */
-    async init(){
+
+    /** Synchronous boot — reads cached profile from localStorage. */
+    _init() {
         try {
-            if (this.user) return;
-            let user = JSON.parse(localStorage.getItem(this.key));
-            this.user = user;
-        } catch (error) {
-            this.redirectToLogin();
+            const stored = localStorage.getItem(this.key);
+            if (stored) this.user = JSON.parse(stored);
+        } catch {
+            localStorage.removeItem(this.key);
         }
     }
-    
-    /** login with email and password */
-    async login(payload = {email: null, password: null}){
-        const data = await api.auth.login(payload);
-        this.user = data.user;
+
+    /** Login with email and password. */
+    async login(payload = { email: null, password: null }) {
+        const data  = await api.auth.login(payload);
+        this.setUser(data.user);
         return data;
     }
-    
-    /** logout and clear current authenticated user info */
-    async logout(){
-        await api.auth.logout().catch((e)=>{ /*ignore */});
-        this.clearUser()
-        this.redirectToLogin()
+
+    /** Logout and clear current authenticated user info. */
+    async logout() {
+        await api.auth.logout().catch(() => { /* ignore */ });
+        this.clearUser();
+        this.redirectToLogin();
     }
-    
-    /** check if currently authenticated user exist */
-    isLoggedIn(){
+
+    /** Returns true when a cached user profile exists. */
+    isLoggedIn() {
         return Boolean(this.user);
     }
-    
-    /** Run a server API call to validate current session */
-    async guard(){
-        await api.auth.me().then((data)=>{
-            this.setUser(data.user);
-            return true;
-        }).catch((e)=>{
-            throw e;
-            return false;
-        });
+
+    /**
+     * Verify the current session with the server.
+     * Throws if unauthenticated — let the caller (main.js) handle the redirect
+     * via the 401 path in api.js.
+     */
+    async guard() {
+        const data = await api.auth.me();
+        this.setUser(data.user);
     }
-    
-    /** Returns currently authenticateed user */
-    getUser(){
-        if (this.user) return this.user;
-        return null;
+
+    /** Returns the currently authenticated user profile or null. */
+    getUser() {
+        return this.user ?? null;
     }
-    
-    /** Set a current authenticated user profile */
-    setUser(profile){
-        localStorage.setItem(this.key, JSON.stringify(profile))
+
+    /** Persist an authenticated user profile. */
+    setUser(profile) {
+        localStorage.setItem(this.key, JSON.stringify(profile));
         this.user = profile;
     }
-    
-    /** Remove current authenticated user profile */
-    clearUser(){
+
+    /** Remove the cached user profile. */
+    clearUser() {
         localStorage.removeItem(this.key);
         this.user = null;
     }
-    
-    /** go to login page */
-    redirectToLogin(){
-        if (window.location.pathname !== "/") window.location.href = "/";          
+
+    /** Redirect to the login page if not already there. */
+    redirectToLogin() {
+        if (window.location.pathname !== '/') window.location.href = '/';
     }
 }
 
-export const auth =  new Auth()
+export const auth = new Auth();

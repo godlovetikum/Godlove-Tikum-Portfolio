@@ -43,4 +43,9 @@ CREATE INDEX IF NOT EXISTS outbound_emails_created_at_idx
     ON public.outbound_emails (created_at DESC);
 CREATE INDEX IF NOT EXISTS outbound_emails_email_type_idx
     ON public.outbound_emails (email_type);
-    
+
+
+-- ── users / sessions ──────────────────────────────────────────
+CREATE INDEX IF NOT EXISTS sessions_token_idx ON public.sessions (token);
+CREATE INDEX IF NOT EXISTS users_email_idx    ON public.users    (email);
+

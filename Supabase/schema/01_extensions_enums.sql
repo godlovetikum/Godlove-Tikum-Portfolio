@@ -55,3 +55,22 @@ CREATE TYPE device_type AS ENUM (
     'mobile',
     'desktop'
 );
+
+
+-- ── pgcrypto ──────────────────────────────────────────────────
+-- Required by the auth functions: bcrypt password hashing via
+-- crypt() / gen_salt() used in 12_functions_auth.sql.
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
+
+-- ── user_role ─────────────────────────────────────────────────
+-- Controls admin panel access.
+-- Only 'admin' is accepted by the auth Edge Function.
+CREATE TYPE user_role AS ENUM ('user', 'admin');
+
+
+-- ── user_status ───────────────────────────────────────────────
+-- Lifecycle state of an admin user account.
+CREATE TYPE user_status AS ENUM (
+    'active', 'disabled', 'banned', 'suspended'
+);

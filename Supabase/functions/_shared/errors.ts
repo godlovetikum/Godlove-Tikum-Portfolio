@@ -198,7 +198,7 @@ export const Errors = {
             400
         ),
         templateAlreadyExist: () => new AppError(
-            'template.already_exist',
+            'template.already_exists',
             'An email template for this category/type already exists. Either update it or delete before retrying.',
             409
         ),
@@ -301,7 +301,7 @@ export const PGErrorMap: Record<string, () => AppError> = {
     'auth.invalid_token':             Errors.auth.invalidToken,
     'auth.session_expired':           Errors.auth.sessionExpired,
     'template.invalid_category_or_type': Errors.email.invalidCategoryOrType,
-    'template.aready_exist':          Errors.email.templateAlreadyExist,
+    'template.already_exists':         Errors.email.templateAlreadyExist,
     'config.key_not_found':           Errors.config.keyNotFound,
     'config.key_already_exist':       Errors.config.keyAlreadyExists,
 };

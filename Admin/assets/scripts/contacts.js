@@ -18,7 +18,7 @@
  */
 
 import { api } from './api.js';
-import { escHtml, fmtDate, showToast, setLoading, countryName } from './utils.js';
+import { escHtml, fmtDate, fmtNum, showToast, setLoading, countryName } from './utils.js';
 import { openEmailCompose }                                       from './email.js';
 import { Export }                                                 from './export.js';
 
@@ -211,8 +211,6 @@ function buildPagination(total, page, limit) {
     const next = page < pages ? `<button class="btn btn_sm btn_ghost" id="nextPageBtn">Next →</button>` : '';
     return `<div class="pagination">${prev}<span class="page_info">Page ${page} of ${pages}</span>${next}</div>`;
 }
-
-function fmtNum(n) { return Number(n).toLocaleString(); }
 
 // ── Events ────────────────────────────────────────────────────────────────────
 

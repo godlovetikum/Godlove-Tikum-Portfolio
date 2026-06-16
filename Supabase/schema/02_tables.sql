@@ -93,6 +93,41 @@ CREATE TABLE IF NOT EXISTS public.brand_config (
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+-- ── users ─────────────────────────────────────────────────────
+-- Admin user accounts. Passwords stored as bcrypt hashes (pgcrypto).
+-- Depends on: user_role, user_status (01_extensions_enums.sql)
+--
+-- Seed: run the INSERT block in 12_functions_auth.sql ONCE with real
+-- credentials, then comment it out. Never commit plain passwords.
+CREATE TABLE IF NOT EXISTS public.users (
+    id             UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+    name           TEXT        NOT NULL,
+    email          TEXT        NOT NULL UNIQUE,
+    password_hash  TEXT        NOT NULL,
+    role           user_role   NOT NULL DEFAULT 'user',
+    status         user_status NOT NULL DEFAULT 'active',
+    last_signin_at TIMESTAMPTZ          DEFAULT NOW(),
+    created_at     TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+
+-- ── sessions ──────────────────────────────────────────────────
+-- Opaque session tokens. One active session per user at a time
+-- (upsert_session enforces this). Foreign key cascades on user delete.
+CREATE TABLE IF NOT EXISTS public.sessions (
+    id           UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id      UUID        NOT NULL REFERENCES public.users (id) ON DELETE CASCADE,
+    token        TEXT        NOT NULL,
+    CONSTRAINT sessions_token_len CHECK (length(token) >= 64),
+    is_active    BOOLEAN              DEFAULT TRUE,
+    ip_address   TEXT,
+    user_agent   TEXT,
+    expires_at   TIMESTAMPTZ NOT NULL DEFAULT NOW() + INTERVAL '7 DAYS',
+    last_seen_at TIMESTAMPTZ          DEFAULT NOW(),
+    created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+
 -- ── outbound_emails ───────────────────────────────────────────
 -- Audit log of every email attempt (trigger-fired or manual).
 -- Written by the email Edge Function after each send attempt.
