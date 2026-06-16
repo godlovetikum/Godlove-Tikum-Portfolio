@@ -1,0 +1,58 @@
+name: Deploy — Public Portfolio
+
+# Triggered manually from the GitHub Actions tab — works from any device,
+# including mobile. No build step: pure static + CF Pages Functions.
+#
+# Required GitHub Secrets (Settings → Secrets → Actions):
+#   CLOUDFLARE_API_TOKEN  — CF API token with Pages:Edit permission
+#   CLOUDFLARE_ACCOUNT_ID — found in the CF dashboard right sidebar
+#   CF_PUBLIC_PROJECT     — name of the CF Pages project for the public site
+#                           (matches portfolio.config.json › cf_public_project)
+#
+# Token substitution:
+#   portfolio.config.json keys are substituted as __KEY__ into HTML, JS,
+#   and sitemap.xml at deploy time. Secrets (SUPABASE_URL, CLIENT_AUTH_SECRET,
+#   etc.) are set as CF environment variables — never substituted here.
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Target environment"
+        required: true
+        default: "production"
+        type: choice
+        options: [production, preview]
+
+jobs:
+  deploy:
+    name: Build & Deploy Public Portfolio
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Substitute portfolio.config.json tokens
+        run: |
+          CONFIG="portfolio.config.json"
+          FILES=$(find Public -type f \( -name "*.html" -o -name "*.js" -o -name "sitemap.xml" \) \
+            ! -path "Public/functions/*")
+
+          while IFS= read -r entry; do
+            KEY=$(echo "$entry"   | jq -r '.key')
+            VALUE=$(echo "$entry" | jq -r '.value')
+            TOKEN="__${KEY^^}__"
+            echo "$FILES" | xargs sed -i "s|${TOKEN}|${VALUE}|g"
+          done < <(jq -c 'to_entries[] | select(.key != "_comment")' "$CONFIG")
+
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: >
+            pages deploy .
+            --project-name=${{ secrets.CF_PUBLIC_PROJECT }}
+            ${{ github.event.inputs.environment == 'preview' && '--branch=preview' || '' }}
+          workingDirectory: Public
