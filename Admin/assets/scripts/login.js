@@ -44,7 +44,7 @@
     
         try {
             await Auth.login({ email, password });
-            window.location.replace = '/dashboard/';
+            window.location.replace('/dashboard/');
         } catch (err) {
             errEl.textContent = err.message;
             errEl.classList.add('visible');

@@ -36,7 +36,7 @@ async function _loadTemplates() {
         const data = await api.email.listTemplates();
         const list = data.templates ?? [];
         _templateCache = new Map(
-            list.map(t => [`${t.category}/${t.email_type}`, t])
+            list.map(t => [`${t.category}/${t.type}`, t])
         );
     } catch {
         _templateCache = new Map();

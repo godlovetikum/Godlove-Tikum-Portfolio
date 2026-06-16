@@ -21,7 +21,7 @@ import type {
 } from '../../_shared/types.ts';
 import { Errors, AppError } from '../../_shared/errors.ts';
 import { db }               from '../../_shared/db.ts';
-import { GasTransport }     from '../providers/google_app_script.ts';
+import { GasTransport }     from '../providers/google_App_Script.ts';
 
 
 // ── EmailService ──────────────────────────────────────────────────────────────

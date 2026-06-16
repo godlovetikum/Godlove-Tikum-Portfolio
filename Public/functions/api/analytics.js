@@ -166,7 +166,6 @@ export async function onRequest({ request, env }) {
             site_key:       clean(body.siteKey || '', 50) || null,
             ip_address:      ipAddress ?? null,
             country:        country ?? null,
-            authorization: env.CLIENT_AUTH_SECRET,
         };
 
     // ── Unknown event type — silent success ───────────────────────

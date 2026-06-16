@@ -130,7 +130,6 @@ function findRemainingTokens(dir) {
 }
 
 // ── Build ────────────────────────────────────────────────────────────────────
-(
 console.log('▶  Cleaning dist/ ...')
 if (fs.existsSync(DIST)) fs.rmSync(DIST, { recursive: true, force: true });
 

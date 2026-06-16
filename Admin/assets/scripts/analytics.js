@@ -28,23 +28,23 @@ export async function renderAnalytics(from, to, view = 'summary') {
         if (view === 'summary') {
             const [summary, geo] = await Promise.all([
                 api.analytics.summary(from, to),
-                api.analytics.raw('visitors', { limit: 200, from, to }).catch(() => ({ rows: [] })),
+                api.analytics.raw('visitors', { limit: 200, from, to }).catch(() => ({ analytics: { rows: [] } })),
             ]);
-            const geoRows = geo.rows ?? geo.data?.rows ?? [];
-            ROOT.innerHTML = buildSummaryHTML(summary.data ?? summary, geoRows);
+            const geoRows = geo.analytics?.rows ?? [];
+            ROOT.innerHTML = buildSummaryHTML(summary.analytics?.summary ?? {}, geoRows);
 
         } else if (view === 'trend') {
             const trend = await api.analytics.trend(from, to);
             ROOT.innerHTML = `<div class="card" style="margin-top:0.5rem">
                 <h3 class="card_title">Daily Trend</h3>
-                ${buildTrendChart(trend.data ?? trend)}
+                ${buildTrendChart(trend.analytics?.trend ?? [])}
             </div>`;
 
         } else if (view === 'raw_visitors' || view === 'raw_clicks') {
             const type = view === 'raw_visitors' ? 'visitors' : 'clicks';
             const res  = await api.analytics.raw(type, { limit: RAW_LIMIT, page: _rawPage, from, to });
-            const rows  = res.rows  ?? res.data?.rows  ?? [];
-            const total = res.total ?? res.data?.total ?? rows.length;
+            const rows  = res.analytics?.rows  ?? [];
+            const total = res.analytics?.total ?? 0;
             ROOT.innerHTML = buildRawHTML(rows, type, total, _rawPage, RAW_LIMIT);
             _bindRawPagination(from, to, view, total);
         }

@@ -15,6 +15,10 @@
  *                                     Requires admin JWT.
  *
  *   POST  caller=manual &
+ *         action=retry              — Retry a failed outbound email (same
+ *                                     handler as send). Requires admin JWT.
+ *
+ *   POST  caller=manual &
  *         action=template           — Create a new email template (admin JWT).
  *
  *   GET   action=templates          — List all email templates (admin JWT).
@@ -36,7 +40,7 @@ import { handleGetOutboundEmails }             from './handlers/get_outbound_ema
 import { validate }                            from '../_shared/validators.ts';
 
 
-const allowedActions = ['alert', 'template', 'templates', 'send', 'outbound'];
+const allowedActions = ['alert', 'template', 'templates', 'send', 'outbound', 'retry'];
 
 Deno.serve(async (req: Request): Promise<Response> => {
     try {
@@ -48,7 +52,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
 
             case 'POST': {
 
-                if (action === 'alert' || caller === 'trigger') {
+                if (action === 'alert' && caller === 'trigger') {
                     await verifyTriggerAuth(req);
                     return await sendByAlertTrigger(req);
                 }
@@ -59,6 +63,11 @@ Deno.serve(async (req: Request): Promise<Response> => {
                 }
 
                 if (action === 'send' && caller === 'manual') {
+                    await verifyAdminAuth(req);
+                    return await sendManualEmail(req);
+                }
+
+                if (action === 'retry' && caller === 'manual') {
                     await verifyAdminAuth(req);
                     return await sendManualEmail(req);
                 }

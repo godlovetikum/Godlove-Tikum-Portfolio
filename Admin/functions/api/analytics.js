@@ -50,7 +50,7 @@ export async function onRequestGet({ request, env }) {
         }
     } catch (err) {
         if (err instanceof AppError) {
-            return respond.error({ code: err.code, message: err.message }, error.status );
+            return respond.error({ code: err.code, message: err.message }, err.status );
         }
         console.error('[analytics.get] Unexpected error:', err.message);
         return respond.error({ code: 'server.unexpected_error', message: 'An unexpected error occurred. Please try again.' }, 500)           
