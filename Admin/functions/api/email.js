@@ -10,7 +10,7 @@
  *
  * Env vars:
  *   SUPABASE_URL   — https://<ref>.supabase.co
- *   ADMIN_ORIGIN   — https://admin.godlovetikum.pages.dev
+ *   ADMIN_ORIGIN   — your admin CF Pages URL (set in CF Pages dashboard)
  */
 
 'use strict';

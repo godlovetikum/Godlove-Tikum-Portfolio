@@ -7,11 +7,10 @@
     const loginBtn = document.getElementById('loginBtn');
     
     // If already logged in, go straight to dashboard
-    Auth.me().then((profile) => {
-        Auth.setUser(profile);
+    Auth.guard().then(() => {
         window.location.replace('/dashboard/');
-    }).catch((gauthErr)=>{
-        console.log(gauthErr)
+    }).catch(() => {
+        // Not authenticated — stay on login page
     });
     
     

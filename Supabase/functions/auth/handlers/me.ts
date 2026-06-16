@@ -21,10 +21,6 @@ export async function getUser(req: Request): Promise<Response> {
     const session: Session = await verifyAdminAuth(req);
     const user: User = await db.auth.getUser(session.user_id);
 
-    if (user?.role !== 'admin' || user?.status !== 'active') {
-        throw Errors.auth.forbidden();
-    }
-
     return successResponse({
         message: 'Session validated successfully.',
         session,

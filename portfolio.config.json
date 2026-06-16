@@ -1,16 +1,23 @@
 {
-  "_comment": "Public deploy-time config. Safe to commit — no secrets. Edit these values when forking for a new portfolio. GitHub Actions reads this file and substitutes __TOKEN__ placeholders in Public and Admin source files before deploying.",
+  "_comment": "Public deploy-time config. Safe to commit — no secrets. Edit these values when forking for a new portfolio. The build script reads this file and substitutes __TOKEN__ placeholders in Public, Admin, Supabase/schema, and Netlify source files before deploying.",
 
-  "owner_name":       "Godlove Tikum",
-  "owner_first_name": "Godlove",
-  "owner_last_name":  "Tikum",
-  "owner_phone":      "237654841420",
-  "owner_email":      "godlovetikum@gmail.com",
-  "owner_location":   "Bamenda, Cameroon",
-  "owner_title":      "full-stack Web Developer",
+  "owner_name":             "Godlove Tikum",
+  "owner_first_name":       "Godlove",
+  "owner_last_name":        "Tikum",
+  "owner_phone":            "237654841420",
+  "owner_whatsapp_display": "+237 654 841 420",
+  "owner_name_url":         "Godlove%20Tikum",
+  "owner_email":            "godlovetikum@gmail.com",
+  "owner_location":         "Bamenda, Cameroon",
+  "owner_title":            "full-stack Web Developer",
+  "owner_previous_name":    "GodyBlogs",
+  "owner_social_handles":   "@godlovetikum (Instagram, YouTube, Threads) \u00b7 @godlovetikum (X/Twitter), @godlovetikum101 (Facebook)",
 
-  "site_url":         "https://godlovetikum.pages.dev",
-  "site_key":         "godlove-tikum-v2",
+  "site_url":               "https://godlovetikum.pages.dev",
+  "site_host":              "godlovetikum.pages.dev",
+  "site_key":               "godlove-tikum-v2",
+
+  "google_site_verification": "a2Xe9n2LEOxR5Y1d8Mcm4lB1Clta56-SOBj-C-99ik8",
 
   "twitter_handle":   "godlovetikum",
   "twitter_url":      "https://www.x.com/godlovetikum",
@@ -21,5 +28,7 @@
   "github_url":       "https://github.com/godlovetikum",
 
   "cf_public_project": "godlovetikum",
-  "cf_admin_project":  "admin-godlove-tikum"
+  "cf_admin_project":  "admin-godlove-tikum",
+
+  "owner_slug": "godlove-tikum"
 }

@@ -22,7 +22,7 @@
  * Environment variables — set in Cloudflare Pages dashboard → Settings → Variables:
  *   SUPABASE_URL         — Supabase project URL (https://ref.supabase.co)
  *   CLIENT_AUTH_SECRET   — Shared secret, must match the value in Supabase Edge Function secrets
- *   PORTFOLIO_ORIGIN     — Canonical site origin, e.g. https://godlovetikum.pages.dev
+ *   PORTFOLIO_ORIGIN     — Canonical site origin (set in CF Pages dashboard)
  */
 
 'use strict';

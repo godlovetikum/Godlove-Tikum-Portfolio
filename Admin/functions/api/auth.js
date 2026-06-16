@@ -13,7 +13,7 @@
  * 
  * Env vars required:
  *   SUPABASE_URL   — https://<ref>.supabase.co
- *   ADMIN_ORIGIN   — https://admin.godlovetikum.pages.dev
+ *   ADMIN_ORIGIN   — your admin CF Pages URL (set in CF Pages dashboard)
  */
 
 'use strict';
@@ -46,9 +46,13 @@ export async function onRequestPost({ request, env }) {
         
         const email = validate.email(body.email ?? '');
         const password = validate.password(body.password ?? '');
-        
-        
-        const fetchResponse = await forwardToBackend(backendUrl, 'POST', { email, password });
+
+        const ipAddress = request.headers.get('CF-Connecting-IP')
+            ?? request.headers.get('X-Forwarded-For')?.split(',')[0]?.trim()
+            ?? null;
+        const userAgent = request.headers.get('User-Agent') ?? null;
+
+        const fetchResponse = await forwardToBackend(backendUrl, 'POST', { email, password, ipAddress, userAgent });
         if (fetchResponse?.success) {
             const { session: newSession, ...otherFields } = fetchResponse.data;
             const cookieHeader = await validate.setCookies(newSession?.token, false)

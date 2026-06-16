@@ -11,11 +11,13 @@
 #
 # Env vars to set in the Cloudflare dashboard (Settings → Environment variables):
 #   SUPABASE_URL         — https://<ref>.supabase.co
-#   PORTFOLIO_ORIGIN     — https://godlovetikum.pages.dev (or custom domain)
+#   PORTFOLIO_ORIGIN     — __SITE_URL__ (or custom domain)
 #   CLIENT_AUTH_SECRET   — shared secret used to authenticate public→backend requests
 #
 # Local dev:
 #   cd Public && npx wrangler pages dev . --compatibility-flag=nodejs_compat
 #   Secrets go in Public/.dev.vars (gitignored)
-name                   = "godlovetikum"
+name                   = "__CF_PUBLIC_PROJECT__"
 pages_build_output_dir = "."
+compatibility_date     = "2024-09-23"
+compatibility_flags    = ["nodejs_compat"]

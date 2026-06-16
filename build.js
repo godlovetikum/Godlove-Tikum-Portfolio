@@ -2,16 +2,19 @@
 /**
  * build.js
  *
- * Reads portfolio.config.json, copies Public/ and Admin/ into dist/,
- * and replaces every __TOKEN__ placeholder with its configured value.
+ * Reads portfolio.config.json, copies Public/, Admin/, Supabase/schema/,
+ * and Netlify/ into dist/, then replaces every __TOKEN__ placeholder
+ * with its configured value.
  *
- * Usage — run from inside the Godlove-Tikum-Portfolio/ directory:
+ * Usage — run from inside the project root directory:
  *
  *   node build.js
  *
  * Output:
- *   dist/public/  →  drag-and-drop into your CF Pages public portfolio project
- *   dist/admin/   →  drag-and-drop into your CF Pages admin dashboard project
+ *   dist/public/   →  drag-and-drop into your CF Pages public portfolio project
+ *   dist/admin/    →  drag-and-drop into your CF Pages admin dashboard project
+ *   dist/sql/      →  paste SQL files in order into the Supabase SQL editor
+ *   dist/netlify/  →  deploy directory for the Netlify SEO redirect layer
  *
  * dist/ is gitignored. Never commit it.
  * No npm install needed — only Node.js built-ins are used.
@@ -30,12 +33,17 @@ const CONFIG = path.join(ROOT, 'portfolio.config.json');
 
 // Source folder → output folder name inside dist/
 const SOURCES = [
-  { src: 'Public', out: 'public' },
-  { src: 'Admin',  out: 'admin'  },
+  { src: 'Public',           out: 'public'  },
+  { src: 'Admin',            out: 'admin'   },
+  { src: 'Supabase/schema',  out: 'sql'     },
+  { src: 'Netlify',          out: 'netlify' },
 ];
 
 // File extensions that may contain __TOKEN__ placeholders
-const SUB_EXTS = new Set(['.html', '.js', '.xml']);
+const SUB_EXTS = new Set(['.html', '.js', '.xml', '.sql', '.toml', '.txt']);
+
+// Specific filenames (no extension) that may contain __TOKEN__ placeholders
+const SUB_NAMES = new Set(['_headers', '_redirects']);
 
 // Top-level directories inside each source that are skipped for substitution.
 // CF Pages Functions read runtime secrets from CF env vars — not from tokens.
@@ -95,6 +103,11 @@ function substituteFile(filePath) {
   if (changed) fs.writeFileSync(filePath, content, 'utf8');
 }
 
+function shouldSubstitute(entryName) {
+  return SUB_EXTS.has(path.extname(entryName).toLowerCase()) ||
+         SUB_NAMES.has(entryName);
+}
+
 function walkAndSubstitute(dir, srcRoot) {
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
     const full = path.join(dir, entry.name);
@@ -104,7 +117,7 @@ function walkAndSubstitute(dir, srcRoot) {
       const topLevel   = relFromSrc.split(path.sep)[0];
       if (SKIP_SUB_DIRS.has(topLevel)) continue;
       walkAndSubstitute(full, srcRoot);
-    } else if (SUB_EXTS.has(path.extname(entry.name).toLowerCase())) {
+    } else if (shouldSubstitute(entry.name)) {
       substituteFile(full);
     }
   }
@@ -119,7 +132,7 @@ function findRemainingTokens(dir) {
       results.push(...findRemainingTokens(full));
       continue;
     }
-    if (!SUB_EXTS.has(path.extname(entry.name).toLowerCase())) continue;
+    if (!shouldSubstitute(entry.name)) continue;
     const content = fs.readFileSync(full, 'utf8');
     const matches = [...new Set(content.match(/__[A-Z][A-Z0-9_]*__/g) ?? [])];
     for (const token of matches) {
@@ -183,7 +196,7 @@ console.log(`\
   supabase login   # one-time
   Then, from this directory:
     supabase functions deploy analytics   --project-ref <YOUR_REF> --no-verify-jwt
-    supabase functions deploy auth        --project-ref <YOUR_REF>the --no-verify-jwt
+    supabase functions deploy auth        --project-ref <YOUR_REF> --no-verify-jwt
     supabase functions deploy contacts    --project-ref <YOUR_REF> --no-verify-jwt
     supabase functions deploy config      --project-ref <YOUR_REF> --no-verify-jwt
     supabase functions deploy email       --project-ref <YOUR_REF> --no-verify-jwt
@@ -191,8 +204,14 @@ console.log(`\
 
   SUPABASE SQL — paste in SQL Editor, first time only
   ─────────────────────────────────────────────────────
+  All SQL files are in dist/sql/ with your config values filled in.
   Run in order: 01 → 02 → 03 → 04 → 05 → 06 → 07 → 08 → 09 → 10 → 11 → 12
   Then run the INSERT in 12_functions_auth.sql once to create your admin user.
+
+  NETLIFY — SEO redirect layer (optional)
+  ─────────────────────────────────────────
+  Drag and drop the folder:   dist/netlify/
+  (or connect Netlify to the repo with publish directory = Netlify/)
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 `);

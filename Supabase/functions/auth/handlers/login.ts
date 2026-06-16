@@ -28,7 +28,7 @@ export async function login(req: Request): Promise<Response> {
     if (!password) throw Errors.validation.missingField('password');
 
     const user: User = await db.auth.validatePassword({ email, password });
-    if (user?.role !== 'admin') throw Errors.auth.forbidden();
+    if (user?.role !== 'admin' || user?.status !== 'active') throw Errors.auth.forbidden();
 
     const newToken   = createSessionToken();
     const expires_at = getSessionExpiry();

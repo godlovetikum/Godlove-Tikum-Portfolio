@@ -28,6 +28,6 @@ Allow: /
 
 # Machine-readable identity for all AI and language model crawlers
 # See the llms.txt standard at https://llmstxt.org
-LLMs: https://godlovetikum.pages.dev/llms.txt
+LLMs: __SITE_URL__/llms.txt
 
-Sitemap: https://godlovetikum.pages.dev/sitemap.xml
+Sitemap: __SITE_URL__/sitemap.xml
