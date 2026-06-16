@@ -116,7 +116,7 @@ AS $$
 DECLARE
     v_row public.email_templates;
 BEGIN
-    INSERT INTO public.email_templates (category, type, subject, html_body, text_body)
+    INSERT INTO public.email_templates (category, "type", subject, html_body, text_body)
     VALUES (p_category::contact_category, p_type::email_type, p_subject, p_html_body, p_text_body)
     RETURNING * INTO v_row;
 

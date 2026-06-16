@@ -53,7 +53,7 @@ CREATE TABLE IF NOT EXISTS public.contacts (
     category         contact_category NOT NULL DEFAULT 'other',
     page             TEXT,
     site_key         TEXT,
-    session_id       TEXT             NOT NULL REFERENCES public.analytics_visitors (session_id),
+    session_id       TEXT             REFERENCES public.analytics_visitors (session_id),
     ip_address       TEXT,
     country          TEXT,
     status           contact_status   NOT NULL DEFAULT 'new',

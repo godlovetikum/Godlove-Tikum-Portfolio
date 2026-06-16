@@ -1,6 +1,6 @@
 # Godlove Tikum — Portfolio
 
-A personal portfolio and admin dashboard system for a freelance web developer. Built as a reusable template: fork it, edit one config file, add your GitHub secrets, and deploy with three button clicks — all from a phone.
+A personal portfolio and admin dashboard system for a freelance web developer. Built as a reusable template: fork it, edit one config file, run `node build.js`, and drag-and-drop to deploy — no CI, no build tools, no npx.
 
 ---
 
@@ -38,94 +38,150 @@ Godlove-Tikum-Portfolio/
 ├── Supabase/
 │   ├── functions/        ── Deno Edge Functions (auth, contacts, analytics, email, config)
 │   │   └── _shared/      ── types.ts · auth.ts · response.ts · errors.ts · db.ts
-│   └── schema/           ── SQL migration files (run in order: 01 → 12)
+│   └── schema/           ── SQL files (run in order: 01 → 12)
 │
 ├── GAS/
 │   └── email.js          ── Google Apps Script email transport (deployed separately)
 │
 ├── Netlify/              ── Legacy redirect shim (see note below)
 │
+├── build.js              ── Token substitution script — run locally before deploying
 └── portfolio.config.json ── Single source of truth for all public deploy-time values
 ```
 
-**Request flow:**  
-Visitor → Cloudflare Pages (Public) → CF Pages Function → Supabase Edge Function → PostgreSQL  
-Admin → Cloudflare Pages (Admin) → CF Pages Function → Supabase Edge Function → PostgreSQL  
+**Request flow:**
+Visitor → Cloudflare Pages (Public) → CF Pages Function → Supabase Edge Function → PostgreSQL
+Admin → Cloudflare Pages (Admin) → CF Pages Function → Supabase Edge Function → PostgreSQL
 Email → Supabase Edge Function → Google Apps Script webhook → Gmail
 
 ---
 
-## Using this as a Template
+## Deploy Checklist
 
-1. **Fork the repository** on GitHub.
+### Step 1 — Edit `portfolio.config.json`
 
-2. **Edit `portfolio.config.json`** (one file, all public values — safe to commit):
-   ```json
-   {
-     "owner_name":       "Your Name",
-     "owner_first_name": "First",
-     "owner_last_name":  "Last",
-     "owner_phone":      "countrycode+number",
-     "owner_email":      "you@example.com",
-     "owner_location":   "City, Country",
-     "owner_title":      "your title",
-     "site_url":         "https://yoursite.pages.dev",
-     "site_key":         "yoursite-v1",
-     "twitter_handle":   "yourhandle",
-     ...
-   }
-   ```
-   Replace images in `Public/public/assets/images/` with your own (keep the same filenames or update `index.html`).
+All public, non-secret values live in one file. Safe to commit.
 
-3. **Add GitHub secrets** (Settings → Secrets and variables → Actions):
+```json
+{
+  "owner_name":       "Your Name",
+  "owner_first_name": "First",
+  "owner_last_name":  "Last",
+  "owner_phone":      "countrycode+number",
+  "owner_email":      "you@example.com",
+  "owner_location":   "City, Country",
+  "owner_title":      "your title",
+  "site_url":         "https://yoursite.pages.dev",
+  "site_key":         "yoursite-v1",
+  "twitter_handle":   "yourhandle",
+  ...
+}
+```
 
-   | Secret | Where to get it |
-   |---|---|
-   | `CLOUDFLARE_API_TOKEN` | CF dashboard → My Profile → API Tokens |
-   | `CLOUDFLARE_ACCOUNT_ID` | CF dashboard → right-side panel |
-   | `CF_PUBLIC_PROJECT` | Name of your CF Pages project for the public site |
-   | `CF_ADMIN_PROJECT` | Name of your CF Pages project for the admin dashboard |
-   | `SUPABASE_ACCESS_TOKEN` | Supabase dashboard → Account → Access Tokens |
-   | `SUPABASE_PROJECT_REF` | Supabase dashboard → Project Settings → Reference ID |
-
-4. **Run the three deploy workflows** (from the GitHub Actions tab, works from mobile):
-   - **Deploy — Public Portfolio**
-   - **Deploy — Admin Dashboard**
-   - **Deploy — Supabase Edge Functions**
-
-5. **Set Cloudflare environment variables** for each Pages project in the CF dashboard (these are secrets — never in `portfolio.config.json`):
-
-   Public project:
-   | Variable | Value |
-   |---|---|
-   | `SUPABASE_URL` | `https://<ref>.supabase.co` |
-   | `PORTFOLIO_ORIGIN` | your public site URL |
-   | `CLIENT_AUTH_SECRET` | a strong random secret |
-
-   Admin project:
-   | Variable | Value |
-   |---|---|
-   | `SUPABASE_URL` | `https://<ref>.supabase.co` |
-   | `ADMIN_ORIGIN` | your admin site URL |
-   | `CLIENT_AUTH_SECRET` | same secret as above |
+Replace images in `Public/assets/images/` with your own (keep the same filenames, or update `index.html`).
 
 ---
 
-## First-Time Supabase Setup
+### Step 2 — Build (token substitution)
 
-Run SQL files in order from the Supabase dashboard → SQL Editor:
+```sh
+node build.js
+```
+
+This reads `portfolio.config.json`, copies `Public/` and `Admin/` into `dist/`, and replaces every `__TOKEN__` placeholder with its value. The script prints any unresolved tokens so you can catch typos before deploying.
+
+Output:
+```
+dist/public/   ← ready to upload for the public portfolio
+dist/admin/    ← ready to upload for the admin dashboard
+```
+
+`dist/` is gitignored — never commit it.
+
+---
+
+### Step 3 — Deploy to Cloudflare Pages (drag-and-drop)
+
+1. Go to **dash.cloudflare.com → Workers & Pages**.
+2. Open your **public portfolio** project → **Deployments** → **Upload assets**.
+   Drag and drop the `dist/public/` folder into the upload area.
+3. Open your **admin dashboard** project → **Deployments** → **Upload assets**.
+   Drag and drop the `dist/admin/` folder.
+
+Cloudflare automatically picks up the `functions/` subdirectory inside each folder and deploys it as CF Pages Functions. No Wrangler required.
+
+> **First time?** Create both Pages projects in the CF dashboard before uploading. Choose **"Upload assets"** (not the Git integration).
+
+---
+
+### Step 4 — Set Cloudflare environment variables
+
+Set these in the CF dashboard for each project under **Settings → Environment variables → Production**.
+
+**Public portfolio project:**
+
+| Variable | Value |
+|---|---|
+| `SUPABASE_URL` | `https://<ref>.supabase.co` |
+| `PORTFOLIO_ORIGIN` | your public site URL |
+| `CLIENT_AUTH_SECRET` | a strong random secret (min 32 chars) |
+
+**Admin dashboard project:**
+
+| Variable | Value |
+|---|---|
+| `SUPABASE_URL` | `https://<ref>.supabase.co` |
+| `ADMIN_ORIGIN` | your admin site URL |
+| `CLIENT_AUTH_SECRET` | same secret as above |
+
+---
+
+### Step 5 — First-time Supabase SQL setup
+
+Open the **Supabase dashboard → SQL Editor** and run each file in `Supabase/schema/` in order. Paste the contents of each file and click **Run**:
 
 ```
 01_extensions_enums.sql
 02_tables.sql
-03_rls.sql           (if present)
-...
+03_indexes.sql
+04_rls.sql
+05_functions_triggers.sql
+06_functions_contact.sql
+07_functions_analytics.sql
+08_functions_email.sql
+09_functions_config.sql
 10_seed_email_templates.sql
+11_seed_brand_config.sql
+12_functions_auth.sql
 ```
 
-Deploy Edge Functions (step 4 above covers this).
+After running `12_functions_auth.sql`, scroll to the **Seed admin user** section at the top of that file, fill in your name, email, and password, uncomment the INSERT, run it once, then comment it back out.
 
-Set Supabase secrets (Dashboard → Edge Functions → Manage secrets):
+---
+
+### Step 6 — Deploy Supabase Edge Functions
+
+Install the [Supabase CLI](https://supabase.com/docs/guides/cli) once, then run from this directory:
+
+```sh
+supabase login
+
+supabase functions deploy analytics   --project-ref <YOUR_REF> --no-verify-jwt
+supabase functions deploy auth        --project-ref <YOUR_REF> --no-verify-jwt
+supabase functions deploy contacts    --project-ref <YOUR_REF> --no-verify-jwt
+supabase functions deploy config      --project-ref <YOUR_REF> --no-verify-jwt
+supabase functions deploy email       --project-ref <YOUR_REF> --no-verify-jwt
+supabase functions deploy ping_shared --project-ref <YOUR_REF> --no-verify-jwt
+```
+
+Find `YOUR_REF` in Supabase dashboard → **Project Settings → General → Reference ID**.
+
+---
+
+### Step 7 — Set Supabase secrets
+
+In the Supabase dashboard → **Edge Functions → Manage secrets**:
+
 | Secret | Value |
 |---|---|
 | `CLIENT_AUTH_SECRET` | same value as the CF env var |
@@ -136,7 +192,7 @@ Set Supabase secrets (Dashboard → Edge Functions → Manage secrets):
 
 ## Google Apps Script Email Provider
 
-The email transport is a Google Apps Script web app that receives a POST request from the Supabase email Edge Function and sends via Gmail.
+The email transport is a Google Apps Script web app that receives a POST from the Supabase email Edge Function and sends via Gmail.
 
 **One-time setup:**
 1. Go to [script.google.com](https://script.google.com) and create a new project.
@@ -149,16 +205,28 @@ If the GAS project hits a quota or the URL changes after redeployment, update `G
 
 ---
 
+## Token System
+
+Source files (`Public/`, `Admin/`) contain `__TOKEN_NAME__` placeholders with double underscores. `build.js` reads `portfolio.config.json`, uppercases each key to form the token name, and substitutes all occurrences before you upload.
+
+**Token substitution targets:** `.html`, `.js`, `.xml` files — excluding anything under `functions/` (those read secrets from CF env vars at runtime, not from file tokens).
+
+**These are deploy-time tokens, distinct from runtime email template `{{placeholders}}`.**
+`__OWNER_NAME__` is replaced once when you run `build.js`.
+`{{name}}` is resolved from `brand_config` on every email send.
+
+---
+
 ## Brand Config (Runtime Values)
 
-The `brand_config` table in Supabase holds runtime key-value pairs used as `{{placeholder}}` substitutions in email templates. These are **not** deploy-time tokens — they are editable from the Admin dashboard under **Settings → Brand Config** without redeploying anything.
+The `brand_config` table in Supabase holds runtime key-value pairs used as `{{placeholder}}` substitutions in email templates. Editable from the Admin dashboard under **Settings → Brand Config** without redeploying anything.
 
-Typical brand config keys set after first deploy:
+Typical keys to set after first deploy:
 - `owner_name`, `owner_email`, `whatsapp_number`
 - `site_url`, `admin_url`
 - Any custom `{{placeholder}}` referenced in your email templates
 
-This is intentionally separate from `portfolio.config.json`. The config file handles the static HTML/JS substitution at deploy time; `brand_config` handles the dynamic email template values at runtime.
+This is intentionally separate from `portfolio.config.json`. The config file handles the static HTML/JS substitution at build time; `brand_config` handles the dynamic email template values at runtime.
 
 ---
 
@@ -166,47 +234,28 @@ This is intentionally separate from `portfolio.config.json`. The config file han
 
 The `Netlify/` folder is a legacy redirect shim from when the portfolio was hosted on Netlify. It contains a single `index.html` that redirects all visitors to the current Cloudflare Pages domain, preserving URL paths.
 
-**Keep it deployed on Netlify** if the old Netlify URL is still in circulation (bookmarks, search engine results). It requires no maintenance and will continue to redirect correctly as long as `SITE_URL` in `Netlify/index.html` points to the active domain.
+Keep it deployed on Netlify if the old Netlify URL is still in circulation (bookmarks, search engine results). It requires no maintenance and will continue to redirect correctly as long as `SITE_URL` in `Netlify/index.html` points to the active domain.
 
 If the Netlify project has been deleted and no traffic comes from the old domain, the folder can be removed.
 
 ---
 
-## Deploy Workflows
-
-All three workflows are triggered manually from **GitHub → Actions tab** (works from the GitHub mobile app).
-
-| Workflow | What it does |
-|---|---|
-| **Deploy — Public Portfolio** | Substitutes `__TOKEN__` values from `portfolio.config.json`, deploys `Public/` to Cloudflare Pages |
-| **Deploy — Admin Dashboard** | Same substitution for Admin files, deploys `Admin/` to Cloudflare Pages |
-| **Deploy — Supabase Edge Functions** | Deploys all functions in `Supabase/functions/` using the Supabase CLI. Optionally pass a single function name to deploy only that function. |
-
----
-
-## Token System
-
-Source files contain `__TOKEN_NAME__` placeholders (double underscores). GitHub Actions reads `portfolio.config.json`, converts each key to uppercase, and runs `sed` across all HTML and JS files before deploying. The substituted files are never committed — only the source files with tokens are in git.
-
-**These are deploy-time tokens, distinct from runtime email template `{{placeholders}}`.**  
-Do not confuse the two: `__OWNER_NAME__` is replaced once at deploy time; `{{name}}` is resolved from `brand_config` on every email send.
-
----
-
 ## Local Development (Optional)
+
+Run the sites locally with Wrangler — no build step needed, tokens stay as placeholders (or set equivalent values in `.dev.vars`).
 
 **Public site:**
 ```sh
 cd Public
 npx wrangler pages dev . --compatibility-flag=nodejs_compat
-# Secrets go in Public/.dev.vars
+# Secrets go in Public/.dev.vars  (gitignored)
 ```
 
 **Admin dashboard:**
 ```sh
 cd Admin
 npx wrangler pages dev . --compatibility-flag=nodejs_compat
-# Secrets go in Admin/.dev.vars
+# Secrets go in Admin/.dev.vars  (gitignored)
 ```
 
 **Supabase Edge Functions:**
@@ -214,5 +263,3 @@ npx wrangler pages dev . --compatibility-flag=nodejs_compat
 supabase start
 supabase functions serve --env-file ./Supabase/.env.local
 ```
-
-For local dev, token substitution is not run — use the hardcoded values in the source files directly (or create a local `.dev.vars` that sets the equivalent runtime values).

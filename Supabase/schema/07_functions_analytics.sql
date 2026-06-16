@@ -146,6 +146,7 @@ BEGIN
                AND (p_from IS NULL OR created_at >= p_from)
                AND (p_to   IS NULL OR created_at <= p_to)
              GROUP BY page
+             ORDER BY cnt DESC
              LIMIT 10
          ) p),
 
@@ -169,6 +170,7 @@ BEGIN
                AND (p_from IS NULL OR created_at >= p_from)
                AND (p_to   IS NULL OR created_at <= p_to)
              GROUP BY country
+             ORDER BY cnt DESC
              LIMIT 20
          ) c),
 

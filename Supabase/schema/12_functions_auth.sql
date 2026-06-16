@@ -94,7 +94,7 @@ LANGUAGE plpgsql SECURITY DEFINER
 AS $$
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM public.users u WHERE u.id = p_user_id) THEN
-        RAISE EXCEPTION 'auth.invalid_credentials';
+        RAISE EXCEPTION 'auth.user_not_found';
     END IF;
 
     RETURN QUERY

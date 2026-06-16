@@ -49,6 +49,6 @@ CREATE TRIGGER email_templates_updated_at
 -- ============================================================
 -- ADMIN USER SETUP
 -- ──────────────────────────────────────────────────────────────
--- Admin users are managed in public.users via 12_admins.sql.
--- See 12_admins.sql for the seed INSERT and authentication RPCs.
+-- Admin users are managed in public.users via 12_functions_auth.sql.
+-- See 12_functions_auth.sql for the seed INSERT and authentication RPCs.
 -- ============================================================
